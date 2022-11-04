@@ -1,4 +1,4 @@
-#include "sm4.h"
+#include "../include/sm4.h"
 
 void reverse_change_R(u32 *dst, u32 *src){
     /* 反序变换R
@@ -86,21 +86,21 @@ void gen_round_keys(u8 *usr_key, u32 *rk_array){
     }
 }
 
-void crypt_128bit(u32 *usr_data, u32 *usr_key, u32 *crypted_data, int crypt_mode){
+void crypt_128bit_ECB(u32 *usr_data, u32 *rk_array, u32 *crypted_data, int crypt_mode){
     /* 对输入的128bit = 4 * 32bit数据做加密/解密操作, 得到128bit = 4 * 32bit输出
-     * 输入：待加密/解密数据usr_data[4], 用户密钥usr_key[4], 加密/解密模式crypt_mode
+     * 输入：待加密/解密数据usr_data[4], 用户密钥rk_array[32], 加密/解密模式crypt_mode
      * 输出：存放在crypted_data[4]中
      */
     u32 data_copy[36] = {0x0};
-    u32 rk_array[32] = {0x0};
+    //u32 rk_array[32] = {0x0};
     memcpy(data_copy, usr_data, sizeof(u32) * 4);
     memset(crypted_data, 0x0, sizeof(u32) * 4);
-    gen_round_keys(usr_key, rk_array);
+    //gen_round_keys(usr_key, rk_array);  // 对于同一份文件的ECB加密过程，从始至终使用的都是同一份密钥，只在最开始计算一次就行
     for (int i = 0; i < 32; i++){
         if (crypt_mode == ENCRYPT){
-            data_copy[i + 4] = round_fun_F(&(data_copy[i]), &(rk_array[i]));
+            data_copy[i + 4] = round_fun_F(&(data_copy[i]), rk_array[i]);
         } else if (crypt_mode == DECRYPT){
-            data_copy[i + 4] = round_fun_F(&(data_copy[i]), &(rk_array[31 - i]));
+            data_copy[i + 4] = round_fun_F(&(data_copy[i]), rk_array[31 - i]);
         } else {
             // 解码模式异常，直接退出
             exit(0);
