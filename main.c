@@ -4,6 +4,12 @@
 
 int main(int argc, char *argv[]){
     usr_info *info;
+    memset(info->usr_data_filename, 0x0, sizeof(char) * FILENAME_LENGTH);
+    memset(info->usr_key_filename, 0x0, sizeof(char) * FILENAME_LENGTH);
+    memset(info->usr_out_filename, 0x0, sizeof(char) * FILENAME_LENGTH);
+    info->crypt_mode = -1;
+    info->option = flag_help;
+    
     check_paras(argc, argv, info);
 
     if(info->option == flag_help){
