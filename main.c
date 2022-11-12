@@ -4,7 +4,7 @@
 
 int main(int argc, char *argv[]){
 
-    usr_info *info;
+    usr_info *info = (usr_info*)malloc(sizeof(usr_info));
     memset(info->usr_data_filename, 0x0, sizeof(char) * FILENAME_LENGTH);
     memset(info->usr_key_filename, 0x0, sizeof(char) * FILENAME_LENGTH);
     memset(info->usr_out_filename, 0x0, sizeof(char) * FILENAME_LENGTH);
