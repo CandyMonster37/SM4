@@ -3,18 +3,18 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "../include/sm4.h"
+#include "sm4.h"
 
 #define FILENAME_LENGTH 255
 
 enum {flag_help = -4, flag_test, flag_encrypt = ENCRYPT, flag_decrypt = DECRYPT}option_flag;
 
 typedef struct{
-    char usr_data_filename[FILENAME_LENGTH] = { 0x0 };
-    char usr_key_filename[FILENAME_LENGTH] = { 0x0 };
-    char usr_out_filename[FILENAME_LENGTH] = { 0x0 };
-    int crypt_mode = -1;
-    int option = -4;
+    char usr_data_filename[FILENAME_LENGTH];
+    char usr_key_filename[FILENAME_LENGTH];
+    char usr_out_filename[FILENAME_LENGTH];
+    int crypt_mode;
+    int option;
 }usr_info;
 
 int get_end_of_text(u32 *to_remove, u8 *tail_bytes);            // 解密时找到真实剩余的字节数
