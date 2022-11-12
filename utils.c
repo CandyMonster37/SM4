@@ -39,9 +39,9 @@ void check_paras(int argc, char *argv[], usr_info *info){
         }
         return;
     } else if(argc == 7){
-        char flag_input = 0x00;
-        char flag_output = 0x00;
-        char flag_keyfile = 0x00;
+        unsigned char flag_input = 0x00;
+        unsigned char flag_output = 0x00;
+        unsigned char flag_keyfile = 0x00;
         // do check and update idx
         for(int idx = 1; idx < argc; idx += 2){
             if(strcmp(argv[idx], "--encrypt") == 0 || strcmp(argv[idx], "--decrypt") == 0){
@@ -67,7 +67,7 @@ void check_paras(int argc, char *argv[], usr_info *info){
                 continue;
             }
         }
-        char flag_right = flag_input & flag_output & flag_keyfile;
+        unsigned char flag_right = flag_input & flag_output & flag_keyfile;
         if(flag_right == 0xff){
             // 如果参数无误，则flag_right的值为0xff
             if(info->option == flag_encrypt) {
