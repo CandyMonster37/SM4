@@ -6,8 +6,10 @@
 #include "sm4.h"
 
 #define FILENAME_LENGTH 255
-
-enum {flag_help = -4, flag_test, flag_encrypt = ENCRYPT, flag_decrypt = DECRYPT}option_flag;
+#define flag_help		-4
+#define flag_test		-3
+#define flag_encrypt	ENCRYPT
+#define flag_decrypt	DECRYPT
 
 typedef struct{
     char usr_data_filename[FILENAME_LENGTH];
