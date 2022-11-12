@@ -128,14 +128,14 @@ void test_speed(){
     };
     printf("测试明文输入：");
     for(int i = 0; i < 15; i++){
-        printf("0x%x, ", input_data_8[i]);
+        printf("0x%02x, ", input_data_8[i]);
     }
-    printf("0x%x\n", input_data_8[15]);
+    printf("0x%02x\n", input_data_8[15]);
     printf("测试密钥：");
     for(int i = 0; i < 15; i++){
-        printf("0x%x, ", usr_key_8[i]);
+        printf("0x%02x, ", usr_key_8[i]);
     }
-    printf("0x%x\n", usr_key_8[15]);
+    printf("0x%02x\n", usr_key_8[15]);
 
     u32 input_data_32[4] = { 0x0 };
     u32 usr_key_32[32] = { 0x0 };
@@ -151,9 +151,9 @@ void test_speed(){
     }
     printf("测试密文结果：");
     for(int i = 0; i < 15; i++){
-        printf("0x%x, ", encrypt_data_8[i]);
+        printf("0x%02x, ", encrypt_data_8[i]);
     }
-    printf("0x%x\n", encrypt_data_8[15]);
+    printf("0x%02x\n", encrypt_data_8[15]);
     
     u8 decrypt_data_8[16] = { 0x0 };
     u32 decrypt_data_32[4] = { 0x0 };
@@ -163,9 +163,9 @@ void test_speed(){
     }
     printf("测试解密结果：");
     for(int i = 0; i < 15; i++){
-        printf("0x%x, ", decrypt_data_8[i]);
+        printf("0x%02x, ", decrypt_data_8[i]);
     }
-    printf("0x%x\n", decrypt_data_8[15]);
+    printf("0x%02x\n", decrypt_data_8[15]);
 }
 
 
