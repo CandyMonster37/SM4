@@ -1,4 +1,4 @@
-#include "../include/sm4.h"
+#include "sm4.h"
 
 void reverse_change_R(u32 *dst, u32 *src){
     /* 反序变换R
@@ -65,11 +65,11 @@ void gen_round_keys(u8 *usr_key, u32 *rk_array){
     four_char_to_int(&(usr_key[0]), &(tmp_K[0]));
     tmp_K[0] = tmp_K[0] ^ SYS_PARAMS_FK[0];
     four_char_to_int(&(usr_key[4]), &(tmp_K[1]));
-    tmp_K[0] = tmp_K[1] ^ SYS_PARAMS_FK[1];
+    tmp_K[1] = tmp_K[1] ^ SYS_PARAMS_FK[1];
     four_char_to_int(&(usr_key[8]), &(tmp_K[2]));
-    tmp_K[0] = tmp_K[2] ^ SYS_PARAMS_FK[2];
+    tmp_K[2] = tmp_K[2] ^ SYS_PARAMS_FK[2];
     four_char_to_int(&(usr_key[12]), &(tmp_K[3]));
-    tmp_K[0] = tmp_K[3] ^ SYS_PARAMS_FK[3];
+    tmp_K[3] = tmp_K[3] ^ SYS_PARAMS_FK[3];
 
     for (int i = 0; i < 32; i++){
         u32 result_tmp_T = 0;
