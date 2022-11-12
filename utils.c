@@ -145,7 +145,7 @@ void test_speed(){
     for(int i = 0; i < 4; i++){
         four_char_to_int(&(input_data_8[i * 4]), &(input_data_32[i]));
     }
-    crypt_128bit(input_data_32, usr_key_32, encrypt_data_32, ENCRYPT);
+    crypt_128bit_ECB(input_data_32, usr_key_32, encrypt_data_32, ENCRYPT);
     for(int i = 0; i < 4; i++){
         int_to_four_char(encrypt_data_32[i], &(encrypt_data_8[i * 4]));
     }
@@ -157,7 +157,7 @@ void test_speed(){
     
     u8 decrypt_data_8[16] = { 0x0 };
     u32 decrypt_data_32[4] = { 0x0 };
-    crypt_128bit(encrypt_data_32, usr_key_32, decrypt_data_32, DECRYPT);
+    crypt_128bit_ECB(encrypt_data_32, usr_key_32, decrypt_data_32, DECRYPT);
     for(int i = 0; i < 4; i++){
         int_to_four_char(decrypt_data_32[i], &(decrypt_data_8[i * 4]));
     }

@@ -3,6 +3,7 @@
 #include <sys/stat.h>
 
 int main(int argc, char *argv[]){
+
     usr_info *info;
     memset(info->usr_data_filename, 0x0, sizeof(char) * FILENAME_LENGTH);
     memset(info->usr_key_filename, 0x0, sizeof(char) * FILENAME_LENGTH);
@@ -26,16 +27,16 @@ int main(int argc, char *argv[]){
     }
     if(info->option == flag_encrypt || info->option == flag_decrypt){
         // do encryption or do decryption with ECB mode
-        FILE *fp_in = fopen(info->usr_data_filename, 'rb');
-        FILE *fp_key = fopen(info->usr_key_filename, 'rb');
-        FILE *fp_out = fopen(info->usr_out_filename, 'wb');
+        FILE *fp_in = fopen(info->usr_data_filename, "rb");
+        FILE *fp_key = fopen(info->usr_key_filename, "rb");
+        FILE *fp_out = fopen(info->usr_out_filename, "wb");
         if(fp_in == NULL || fp_out == NULL || fp_key == NULL){
             printf("文件打开失败，请检查输入路径或路径权限！\n");
             system("pause");
             return 0;
         }
         fclose(fp_out);  // 清空已存在的文件
-        FILE *fp_out = fopen(info->usr_out_filename, 'ab');
+        fp_out = fopen(info->usr_out_filename, "ab");
 
         u8 input_data_8[16] = { 0x0 };
         u8 usr_key_8[16] = { 0x0 };
@@ -67,10 +68,10 @@ int main(int argc, char *argv[]){
                     // 如果是解密模式，则最后一定是8个字 = 32字节 = 2*128bit
                     u32 to_remove[8] = { 0x0 };
                     fread(input_data_32, sizeof(u32), 4, fp_in);
-                    crypt_128bit(input_data_32, usr_key_32, &(to_remove[0]), info->crypt_mode);
+                    crypt_128bit_ECB(input_data_32, usr_key_32, &(to_remove[0]), info->crypt_mode);
                     memset(input_data_32, 0x0, sizeof(u32) * 4);
                     fread(input_data_32, sizeof(u32), 4, fp_in);
-                    crypt_128bit(input_data_32, usr_key_32, &(to_remove[4]), info->crypt_mode);
+                    crypt_128bit_ECB(input_data_32, usr_key_32, &(to_remove[4]), info->crypt_mode);
                     u8 tail_data[32] = { 0x0 };
                     int tail_bytes = 0;
                     tail_bytes = get_end_of_text(to_remove, tail_data);
@@ -80,7 +81,7 @@ int main(int argc, char *argv[]){
                     if(file_size - dealt_bytes >= 16){
                         // 加密时最后的字节数可能在0-32之间，先处理128bit，确保剩余字节数在0-16之间
                         fread(input_data_32, sizeof(u32), 4, fp_in);
-                        crypt_128bit(input_data_32, usr_key_32, output_data_32, info->crypt_mode);
+                        crypt_128bit_ECB(input_data_32, usr_key_32, output_data_32, info->crypt_mode);
                         fwrite(output_data_32, sizeof(u32), 4, fp_out);
                         dealt_bytes += 16;
                     }
@@ -94,7 +95,7 @@ int main(int argc, char *argv[]){
                     four_char_to_int(&(data_padding[4]), &(input_data_32[1]));
                     four_char_to_int(&(data_padding[8]), &(input_data_32[2]));
                     four_char_to_int(&(data_padding[12]), &(input_data_32[3]));
-                    crypt_128bit(input_data_32, usr_key_32, output_data_32, info->crypt_mode);
+                    crypt_128bit_ECB(input_data_32, usr_key_32, output_data_32, info->crypt_mode);
                     for(int i = 0; i < 4; i++){
                         int_to_four_char(output_data_32[i], &(output_data_8[i * 4]));
                     }
@@ -107,7 +108,7 @@ int main(int argc, char *argv[]){
                     four_char_to_int(&(data_padding[20]), &(input_data_32[1]));
                     four_char_to_int(&(data_padding[24]), &(input_data_32[2]));
                     four_char_to_int(&(data_padding[28]), &(input_data_32[3]));
-                    crypt_128bit(input_data_32, usr_key_32, output_data_32, info->crypt_mode);
+                    crypt_128bit_ECB(input_data_32, usr_key_32, output_data_32, info->crypt_mode);
                     for(int i = 0; i < 4; i++){
                         int_to_four_char(output_data_32[i], &(output_data_8[i * 4]));
                     }
@@ -117,7 +118,7 @@ int main(int argc, char *argv[]){
             }
             // if之外的部分，文件长度一定大于128bit
             fread(input_data_32, sizeof(u32), 4, fp_in);
-            crypt_128bit(input_data_32, usr_key_32, output_data_32, info->crypt_mode);
+            crypt_128bit_ECB(input_data_32, usr_key_32, output_data_32, info->crypt_mode);
             for(int i = 0; i < 4; i++){
                 int_to_four_char(output_data_32[i], &(output_data_8[i * 4]));
             }
