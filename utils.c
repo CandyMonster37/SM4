@@ -1,4 +1,5 @@
 #include "utils.h"
+#include <time.h>
 
 int get_end_of_text(u32 *to_remove, u8 *tail_bytes){
     /* 从后至前寻找文件结束符（不为0的部分）
@@ -34,7 +35,7 @@ void check_paras(int argc, char *argv[], usr_info *info){
             // show help info
             info->option = flag_help;
         } else {
-            printf("** 未找到可用命令，请根据帮助信息检查参数是否有误。\n");
+            printf("** 未找到可用命令，请根据帮助信息检查参数是否有误。 ");
             info->option = flag_help;
         }
         return;
@@ -71,17 +72,17 @@ void check_paras(int argc, char *argv[], usr_info *info){
         if(flag_right == 0xff){
             // 如果参数无误，则flag_right的值为0xff
             if(info->option == flag_encrypt) {
-                printf("根据用户需求对文件进行SM4加密！\n");
+                printf("根据用户需求对文件进行SM4加密！ ");
             } else if(info->option == flag_decrypt){
-                printf("根据用户需求对文件进行SM4解密！\n");
+                printf("根据用户需求对文件进行SM4解密！ ");
             }
         } else {
-            printf("** 未找到可用命令，请根据帮助信息检查参数是否有误。\n");
+            printf("** 未找到可用命令，请根据帮助信息检查参数是否有误。 ");
             info->option = flag_help;
         }
         return;
     } else {
-        printf("** 参数有误，请查看帮助信息！\n");
+        printf("** 参数有误，请查看帮助信息！ ");
         info->option = flag_help;
         return;
     }
@@ -101,23 +102,28 @@ void show_help_info(){
     printf("中国标准分类号（CCS）：    L80                  国际标准分类号（ICS）：  35.040\n");
     printf("发布日期：                2016-08-29           实施日期：              2017-03-01\n");
     printf("\n");
-    printf("SM4算法是一个分组算法。该算法的分组长度为 128 bit，密钥长度为 128 bit。\n");
-    printf("加密算法与密钥扩展算法都采用 32 轮非线性迭代结构。\n");
-    printf("解密算法与加密算法的结构相同，只是轮密钥的使用顺序相反，解密轮密钥是加密轮密钥的逆序。\n");
+    printf("SM4算法是一个分组算法。该算法的分组长度为 128 bit，密钥长度为 128 bit。 ");
+    printf("加密算法与密钥扩展算法都采用 32 轮非线性迭代结构。 ");
+    printf("解密算法与加密算法的结构相同，只是轮密钥的使用顺序相反，解密轮密钥是加密轮密钥的逆序。 ");
     printf("\n\n");
-    printf("使用说明：\n\n");
-    printf("用 usr.key 加密 secret.txt ，并将结果保存到 encrypted.cm ，请在终端中使用如下命令：\n");
+    printf("使用说明： \n");
+    printf("用 usr.key 加密 secret.txt ，并将结果保存到 encrypted.cm ，请在终端中使用如下命令： ");
     printf("sm4.exe --encrypt secret.txt --out encrypted.txt --key usr.key\n\n");
-    printf("用 usr.key 解密 received.cm ，并将结果保存到 decrypted.txt ，请在终端中使用如下命令：\n");
+    printf("用 usr.key 解密 received.cm ，并将结果保存到 decrypted.txt ，请在终端中使用如下命令： ");
     printf("sm4.exe --decrypt received.cm --out decrypted.txt --key usr.key\n\n");
     printf("其他可选参数：\n");
-    printf("    --help            显示本信息并退出程序\n");
-    printf("    --test_speed      使用预设数据测速\n");
+    printf("    --help            显示本信息并退出程序 ");
+    printf("    --test_speed      使用预设数据测速 ");
     printf("\n");
 }
 
 void test_speed(){
-    // todo
+    // 使用预置数据对SM4进行加解密测试
+    char progress_bar[] = "####################";
+    clock_t start, finish;
+    double duration = 0.0;
+    int epoch = 100000; // 重复加解密 epoch 轮
+
     u8 input_data_8[16] = {
         0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef,
         0xfe, 0xdc, 0xba, 0x98, 0x76, 0x54, 0x32, 0x10
@@ -126,6 +132,14 @@ void test_speed(){
         0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef,
         0xfe, 0xdc, 0xba, 0x98, 0x76, 0x54, 0x32, 0x10
     };
+
+    u32 input_data_32[4] = { 0x0 };
+    u32 usr_key_32[32] = { 0x0 };
+    u8 encrypt_data_8[16] = { 0x0 };
+    u32 encrypt_data_32[4] = { 0x0 };
+
+    printf("进行预测试：\n");
+
     printf("测试明文输入：");
     for(int i = 0; i < 15; i++){
         printf("0x%02x, ", input_data_8[i]);
@@ -137,30 +151,26 @@ void test_speed(){
     }
     printf("0x%02x\n", usr_key_8[15]);
 
-    u32 input_data_32[4] = { 0x0 };
-    u32 usr_key_32[32] = { 0x0 };
-    u8 encrypt_data_8[16] = { 0x0 };
-    u32 encrypt_data_32[4] = { 0x0 };
     gen_round_keys(usr_key_8, usr_key_32);
     for(int i = 0; i < 4; i++){
         four_char_to_int(&(input_data_8[i * 4]), &(input_data_32[i]));
     }
     printf("明文32bit输入：");
     for(int i = 0; i < 3; i++){
-    	printf("0x%08x ", input_data_32[i]);
+        printf("0x%08x ", input_data_32[i]);
     }
     printf("0x%08x\n", input_data_32[3]);
-    
+   
     crypt_128bit_ECB(input_data_32, usr_key_32, encrypt_data_32, ENCRYPT);
     for(int i = 0; i < 4; i++){
         int_to_four_char(encrypt_data_32[i], &(encrypt_data_8[i * 4]));
     }
-    printf("测试密文结果：");
+    printf("测试加密结果：");
     for(int i = 0; i < 15; i++){
         printf("0x%02x, ", encrypt_data_8[i]);
     }
     printf("0x%02x\n", encrypt_data_8[15]);
-    
+   
     u8 decrypt_data_8[16] = { 0x0 };
     u32 decrypt_data_32[4] = { 0x0 };
     crypt_128bit_ECB(encrypt_data_32, usr_key_32, decrypt_data_32, DECRYPT);
@@ -172,5 +182,40 @@ void test_speed(){
         printf("0x%02x, ", decrypt_data_8[i]);
     }
     printf("0x%02x\n", decrypt_data_8[15]);
+
+    printf("预测试结束，开始正式测速：\n");
+
+    start = clock();
+    for(int i = 0; i < epoch; i++){
+
+        crypt_128bit_ECB(input_data_32, usr_key_32, encrypt_data_32, ENCRYPT);
+        crypt_128bit_ECB(encrypt_data_32, usr_key_32, decrypt_data_32, DECRYPT);
+
+        // 显示进度条，进度20等分，注意防止越界
+        int current_progress = (int)((i + 1) * 20 / epoch);
+        if(current_progress - 1 >= 0){
+            progress_bar[current_progress - 1] = 0x3d; // 0x3d 就是 "="
+        }
+        if(current_progress < 20){
+            progress_bar[current_progress] = 0x3e; // 0x3e 就是 ">"
+        }
+        double pb_num = (double)((double)i / (double)epoch * 100.0);
+        printf("共计测试 %04d 轮，当前第 %04d 轮 [%s] 进度  %.2f %%", epoch, i, progress_bar, pb_num);
+        if(i < epoch - 1){
+            printf("\r");
+        } else {
+            printf("\n");
+        }
+    }
+    finish = clock();
+    duration = (double)(finish - start) / CLOCKS_PER_SEC; //单位换算成秒
+    double bps = 32.0 * (double)epoch / duration;
+    double mbps = bps / 1000;
+    printf("共计用时： %.2f s，共加密 %04d B数据、解密 %04d 数据，平均速度 %.2f bps，约 %.2f Mbps\n", duration, 16 * epoch, 16 * epoch, bps, mbps);
+   
 }
+
+
+
+
 
