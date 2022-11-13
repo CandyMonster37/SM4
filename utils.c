@@ -145,6 +145,12 @@ void test_speed(){
     for(int i = 0; i < 4; i++){
         four_char_to_int(&(input_data_8[i * 4]), &(input_data_32[i]));
     }
+    printf("明文32bit输入：");
+    for(int i = 0; i < 3; i++){
+    	printf("0x%08x ", input_data_32[i]);
+    }
+    printf("0x%08x\n", input_data_32[3]);
+    
     crypt_128bit_ECB(input_data_32, usr_key_32, encrypt_data_32, ENCRYPT);
     for(int i = 0; i < 4; i++){
         int_to_four_char(encrypt_data_32[i], &(encrypt_data_8[i * 4]));

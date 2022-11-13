@@ -131,14 +131,26 @@ void four_char_to_int(u8 *input8, u32 *output32){
     /*
      * 4个8bit合成1个32bit
      */
+    // // 大端模式 0x01 0x23 0x45 0x67 -> 0x01234567
+    // u32 res = 0x0;
+    // res |= input8[0];
+    // res <<= 8;
+    // res |= input8[1];
+    // res <<= 8;
+    // res |= input8[2];
+    // res <<= 8;
+    // res |= input8[3];
+    // *output32 = res;
+
+    // 小端模式 0x01 0x23 0x45 0x67 -> 0x67452301
     u32 res = 0x0;
-    res |= input8[0];
-    res <<= 8;
-    res |= input8[1];
+    res |= input8[3];
     res <<= 8;
     res |= input8[2];
     res <<= 8;
-    res |= input8[3];
+    res |= input8[1];
+    res <<= 8;
+    res |= input8[0];
     *output32 = res;
 }
 
@@ -148,9 +160,14 @@ void int_to_four_char(u32 input32, u8 *output8){
      */
     memset(output8, 0x0, sizeof(u8) * 4);
     for (int i = 0; i < 4; i++){
-        // 从最低字节开始取的话会取到反序的，因此要用24做减法，从最高字节开始取
         u32 tmp = input32;
-        tmp = tmp >> (24 - i * 8);
+
+        // // 大端模式 0x01234567 -> 0x01 0x23 0x45 0x67
+        // tmp = tmp >> (24 - i * 8);
+
+        // 小端模式 0x01234567 -> 0x67 0x45 0x23 0x01
+        tmp = tmp >> (i * 8);
+       
         output8[i] = (u8)(tmp & 0xff);
     }
 }

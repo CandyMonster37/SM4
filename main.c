@@ -68,6 +68,7 @@ int main(int argc, char *argv[]){
                     // 如果是解密模式，则最后一定是8个字 = 32字节 = 2*128bit
                     u32 to_remove[8] = { 0x0 };
                     fread(input_data_32, sizeof(u32), 4, fp_in);
+    				
                     crypt_128bit_ECB(input_data_32, usr_key_32, &(to_remove[0]), info->crypt_mode);
                     memset(input_data_32, 0x0, sizeof(u32) * 4);
                     fread(input_data_32, sizeof(u32), 4, fp_in);
@@ -78,8 +79,9 @@ int main(int argc, char *argv[]){
                     fwrite(tail_data, sizeof(u8), tail_bytes, fp_out);
                 } else {
                     // 如果是加密模式，就要先判断剩余字节数，然后打0x48 0x59 并缀以若干 0x0的padding
-                    if(file_size - dealt_bytes >= 16){
-                        // 加密时最后的字节数可能在0-32之间，先处理128bit，确保剩余字节数在0-16之间
+                    if(file_size - dealt_bytes > 16){
+                        // 加密时最后的字节数可能在0-32之间
+                        // 如果剩余字节数在17-32之间，先处理128bit，确保剩余字节数在0-16之间
                         fread(input_data_32, sizeof(u32), 4, fp_in);
                         crypt_128bit_ECB(input_data_32, usr_key_32, output_data_32, info->crypt_mode);
                         fwrite(output_data_32, sizeof(u32), 4, fp_out);
