@@ -6,6 +6,7 @@
 #include "sm4.h"
 
 #define FILENAME_LENGTH 255
+
 #define flag_help		-4
 #define flag_test		-3
 #define flag_encrypt	ENCRYPT

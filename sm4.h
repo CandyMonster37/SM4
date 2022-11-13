@@ -22,14 +22,8 @@ void nl_tor(u8 *input_tor, u8 *output_tor);                                     
 void crypt_128bit_ECB(u32 *usr_data, u32 *rk_array, u32 *crypted_data, int crypt_mode);     // ECB模式加密/解共用的函数体
 
 /* **************************************  以下为固定参数  ************************************** */
-
-/* 系统参数FK */
-extern const u32 SYS_PARAMS_FK[4];
-
-/* 固定参数CK */
-extern const u32 SYS_PARAMS_CK[32];
-
-/* S盒 */
-extern const u8 S_BOX[256];
+extern const u32 SYS_PARAMS_FK[4];		// 系统参数FK 
+extern const u32 SYS_PARAMS_CK[32];		// 固定参数CK
+extern const u8 S_BOX[256];				// S盒
 
 #endif

@@ -174,4 +174,3 @@ void test_speed(){
     printf("0x%02x\n", decrypt_data_8[15]);
 }
 
-
