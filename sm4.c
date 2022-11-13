@@ -47,9 +47,9 @@ u32 syn_trans_T(u32 input){
     four_char_to_int(output_tor, &(result_trans_T));
 
     // 线性变换L
-    result_trans_T = result_trans_T ^ round_rotation_left(result_trans_T, 2) 
-                                    ^ round_rotation_left(result_trans_T, 20) 
-                                    ^ round_rotation_left(result_trans_T, 18) 
+    result_trans_T = result_trans_T ^ round_rotation_left(result_trans_T, 2)
+                                    ^ round_rotation_left(result_trans_T, 10)
+                                    ^ round_rotation_left(result_trans_T, 18)
                                     ^ round_rotation_left(result_trans_T, 24);
 
     return result_trans_T;
@@ -79,7 +79,7 @@ void gen_round_keys(u8 *usr_key, u32 *rk_array){
         int_to_four_char(result_tmp_T, input_tor);
         nl_tor(input_tor, output_tor);
         four_char_to_int(output_tor, &(result_tmp_T));
-        result_tmp_T = result_tmp_T ^ round_rotation_left(result_tmp_T, 13) 
+        result_tmp_T = result_tmp_T ^ round_rotation_left(result_tmp_T, 13)
                                     ^ round_rotation_left(result_tmp_T, 23);
         tmp_K[i + 4] = tmp_K[i] ^ result_tmp_T;
         rk_array[i] = tmp_K[i + 4];
@@ -131,27 +131,27 @@ void four_char_to_int(u8 *input8, u32 *output32){
     /*
      * 4个8bit合成1个32bit
      */
-    // // 大端模式 0x01 0x23 0x45 0x67 -> 0x01234567
-    // u32 res = 0x0;
-    // res |= input8[0];
-    // res <<= 8;
-    // res |= input8[1];
-    // res <<= 8;
-    // res |= input8[2];
-    // res <<= 8;
-    // res |= input8[3];
-    // *output32 = res;
-
-    // 小端模式 0x01 0x23 0x45 0x67 -> 0x67452301
+    // 大端模式 0x01 0x23 0x45 0x67 -> 0x01234567
     u32 res = 0x0;
-    res |= input8[3];
-    res <<= 8;
-    res |= input8[2];
+    res |= input8[0];
     res <<= 8;
     res |= input8[1];
     res <<= 8;
-    res |= input8[0];
+    res |= input8[2];
+    res <<= 8;
+    res |= input8[3];
     *output32 = res;
+
+    // // 小端模式 0x01 0x23 0x45 0x67 -> 0x67452301
+    // u32 res = 0x0;
+    // res |= input8[3];
+    // res <<= 8;
+    // res |= input8[2];
+    // res <<= 8;
+    // res |= input8[1];
+    // res <<= 8;
+    // res |= input8[0];
+    // *output32 = res;
 }
 
 void int_to_four_char(u32 input32, u8 *output8){
@@ -162,11 +162,11 @@ void int_to_four_char(u32 input32, u8 *output8){
     for (int i = 0; i < 4; i++){
         u32 tmp = input32;
 
-        // // 大端模式 0x01234567 -> 0x01 0x23 0x45 0x67
-        // tmp = tmp >> (24 - i * 8);
+        // 大端模式 0x01234567 -> 0x01 0x23 0x45 0x67
+        tmp = tmp >> (24 - i * 8);
 
-        // 小端模式 0x01234567 -> 0x67 0x45 0x23 0x01
-        tmp = tmp >> (i * 8);
+        // // 小端模式 0x01234567 -> 0x67 0x45 0x23 0x01
+        // tmp = tmp >> (i * 8);
        
         output8[i] = (u8)(tmp & 0xff);
     }
@@ -213,4 +213,5 @@ const u8 S_BOX[256] = {
     0x89, 0x69, 0x97, 0x4a, 0x0c, 0x96, 0x77, 0x7e, 0x65, 0xb9, 0xf1, 0x09, 0xc5, 0x6e, 0xc6, 0x84,
     0x18, 0xf0, 0x7d, 0xec, 0x3a, 0xdc, 0x4d, 0x20, 0x79, 0xee, 0x5f, 0x3e, 0xd7, 0xcb, 0x39, 0x48
 };
+
 
