@@ -35,7 +35,7 @@ void check_paras(int argc, char *argv[], usr_info *info){
             // show help info
             info->option = flag_help;
         } else {
-            printf("** 未找到可用命令，请根据帮助信息检查参数是否有误。 ");
+            printf("** 未找到可用命令，请根据帮助信息检查参数是否有误。 \n");
             info->option = flag_help;
         }
         return;
@@ -72,17 +72,17 @@ void check_paras(int argc, char *argv[], usr_info *info){
         if(flag_right == 0xff){
             // 如果参数无误，则flag_right的值为0xff
             if(info->option == flag_encrypt) {
-                printf("根据用户需求对文件进行SM4加密！ ");
+                printf("根据用户需求对文件进行SM4加密！ \n");
             } else if(info->option == flag_decrypt){
-                printf("根据用户需求对文件进行SM4解密！ ");
+                printf("根据用户需求对文件进行SM4解密！ \n");
             }
         } else {
-            printf("** 未找到可用命令，请根据帮助信息检查参数是否有误。 ");
+            printf("** 未找到可用命令，请根据帮助信息检查参数是否有误。 \n");
             info->option = flag_help;
         }
         return;
     } else {
-        printf("** 参数有误，请查看帮助信息！ ");
+        printf("** 参数有误，请查看帮助信息！ \n");
         info->option = flag_help;
         return;
     }
@@ -140,12 +140,12 @@ void test_speed(){
 
     printf("进行预测试：\n");
 
-    printf("测试明文输入：");
+    printf("测试明文输入：\n");
     for(int i = 0; i < 15; i++){
         printf("0x%02x, ", input_data_8[i]);
     }
     printf("0x%02x\n", input_data_8[15]);
-    printf("测试密钥：");
+    printf("测试密钥：\n");
     for(int i = 0; i < 15; i++){
         printf("0x%02x, ", usr_key_8[i]);
     }
@@ -155,7 +155,7 @@ void test_speed(){
     for(int i = 0; i < 4; i++){
         four_char_to_int(&(input_data_8[i * 4]), &(input_data_32[i]));
     }
-    printf("明文32bit输入：");
+    printf("明文32bit输入：\n");
     for(int i = 0; i < 3; i++){
         printf("0x%08x ", input_data_32[i]);
     }
@@ -165,7 +165,7 @@ void test_speed(){
     for(int i = 0; i < 4; i++){
         int_to_four_char(encrypt_data_32[i], &(encrypt_data_8[i * 4]));
     }
-    printf("测试加密结果：");
+    printf("测试加密结果：\n");
     for(int i = 0; i < 15; i++){
         printf("0x%02x, ", encrypt_data_8[i]);
     }
@@ -177,7 +177,7 @@ void test_speed(){
     for(int i = 0; i < 4; i++){
         int_to_four_char(decrypt_data_32[i], &(decrypt_data_8[i * 4]));
     }
-    printf("测试解密结果：");
+    printf("测试解密结果：\n");
     for(int i = 0; i < 15; i++){
         printf("0x%02x, ", decrypt_data_8[i]);
     }
@@ -214,6 +214,8 @@ void test_speed(){
     printf("共计用时： %.2f s，共加密 %04d B数据、解密 %04d 数据，平均速度 %.2f bps，约 %.2f Mbps\n", duration, 16 * epoch, 16 * epoch, bps, mbps);
    
 }
+
+
 
 
 
