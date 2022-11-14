@@ -98,7 +98,10 @@ int main(int argc, char *argv[]){
                             four_char_to_int(&(input_data_8[i * 4]), &(input_data_32[i]));
                         }
                         crypt_128bit_ECB(input_data_32, usr_key_32, output_data_32, info->crypt_mode);
-                        fwrite(output_data_32, sizeof(u32), 4, fp_out);
+                        for(int i = 0; i < 4; i++){
+                            int_to_four_char(output_data_32[i], &(output_data_8[i * 4]));
+                        }
+                        fwrite(output_data_8, sizeof(u8), 16, fp_out);
                         dealt_bytes += 16;
                     }
                     // 当剩余字节数在0-16之间时再添加结束标志0X48 0X59，然后剩余位补0x00到32字节
@@ -160,6 +163,8 @@ int main(int argc, char *argv[]){
 
     return 0;
 }
+
+
 
 
 
