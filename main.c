@@ -1,6 +1,7 @@
 #include "sm4.h"
 #include "utils.h"
 #include <sys/stat.h>
+#include <time.h>
 
 int main(int argc, char *argv[]){
 
@@ -15,14 +16,10 @@ int main(int argc, char *argv[]){
 
     if(info->option == flag_help){
         show_help_info();
-        // wait key press
-        system("pause");
         return 0;
     }
     if(info->option == flag_test){
         test_speed();
-        // wait key press
-        system("pause");
         return 0;
     }
     if(info->option == flag_encrypt || info->option == flag_decrypt){
@@ -32,7 +29,6 @@ int main(int argc, char *argv[]){
         FILE *fp_out = fopen(info->usr_out_filename, "wb");
         if(fp_in == NULL || fp_out == NULL || fp_key == NULL){
             printf("文件打开失败，请检查输入路径或路径权限！\n");
-            system("pause");
             return 0;
         }
         fclose(fp_out);  // 清空已存在的文件
@@ -53,8 +49,20 @@ int main(int argc, char *argv[]){
         stat(info->usr_data_filename, &file_info);
         off_t file_size = file_info.st_size;  // 在不打开文件的情况下获取文件大小, 以字节计算
         off_t dealt_bytes = 0;
-        int rest_bytes = file_size % 16;
+        int rest_bytes = file_size % 16; // 文件按16B分组后的剩余数据字节数
+        int total_epoch = (int)(file_size / 16); // 预计总共要处理这么多组数据
+        total_epoch = (info->crypt_mode == DECRYPT) ? total_epoch : total_epoch + 1; // 加密模式有padding，多处理一组；解密模式不用
 
+        printf("开始处理文件，文件大小： %ld B，预计处理 %d 组\n", file_size, total_epoch);
+
+        char progress_bar[] = "####################";
+        clock_t start, finish;
+        double duration = 0.0; // 程序运行时间
+        double pb_num = 0.0; // 进度条数值
+        int current_progress = 0; // 改变进度条显示的下标
+        int current_epoch = 1;  // 当前为第几组
+
+        start = clock();
         while(dealt_bytes < file_size){
             memset(input_data_32, 0x0, sizeof(u32) * 4);
             memset(output_data_32, 0x0, sizeof(u32) * 4);
@@ -74,6 +82,19 @@ int main(int argc, char *argv[]){
                     }
                     crypt_128bit_ECB(input_data_32, usr_key_32, &(to_remove[0]), info->crypt_mode);
 
+                    // 显示进度条，进度20等分，注意防止越界
+                    current_progress = (int)((current_epoch) * 20 / total_epoch);
+                    if(current_progress - 1 >= 0){
+                        progress_bar[current_progress - 1] = 0x3d; // 0x3d 就是 "="
+                    }
+                    if(current_progress < 20){
+                        progress_bar[current_progress] = 0x3e; // 0x3e 就是 ">"
+                    }
+                    pb_num = (double)((double)current_epoch / (double)total_epoch * 100.0);
+                    printf("当前已处理 %04d 组 [%s] 进度  %.2f %%", current_epoch, progress_bar, pb_num);
+                    printf("\r");
+                    current_epoch += 1;
+
                     // 清除变量状态，处理后16字节
                     memset(input_data_8, 0x0, sizeof(u8) * 16);
                     memset(input_data_32, 0x0, sizeof(u32) * 4);
@@ -82,6 +103,19 @@ int main(int argc, char *argv[]){
                         four_char_to_int(&(input_data_8[i * 4]), &(input_data_32[i]));
                     }
                     crypt_128bit_ECB(input_data_32, usr_key_32, &(to_remove[4]), info->crypt_mode);
+
+                    // 显示进度条，进度20等分，注意防止越界
+                    current_progress = (int)((current_epoch) * 20 / total_epoch);
+                    if(current_progress - 1 >= 0){
+                        progress_bar[current_progress - 1] = 0x3d; // 0x3d 就是 "="
+                    }
+                    if(current_progress < 20){
+                        progress_bar[current_progress] = 0x3e; // 0x3e 就是 ">"
+                    }
+                    pb_num = (double)((double)current_epoch / (double)total_epoch * 100.0);
+                    printf("当前已处理 %04d 组 [%s] 进度  %.2f %%", current_epoch, progress_bar, pb_num);
+                    printf("\n");
+                    current_epoch += 1;
 
                     // 结果输出是按字（4B）输出的，要先从字转字节，再去除标志位保存
                     u8 tail_data[32] = { 0x0 };
@@ -103,15 +137,25 @@ int main(int argc, char *argv[]){
                         }
                         fwrite(output_data_8, sizeof(u8), 16, fp_out);
                         dealt_bytes += 16;
+
+                        // 显示进度条，进度20等分，注意防止越界
+                        current_progress = (int)((current_epoch) * 20 / total_epoch);
+                        if(current_progress - 1 >= 0){
+                            progress_bar[current_progress - 1] = 0x3d; // 0x3d 就是 "="
+                        }
+                        if(current_progress < 20){
+                            progress_bar[current_progress] = 0x3e; // 0x3e 就是 ">"
+                        }
+                        pb_num = (double)((double)current_epoch / (double)total_epoch * 100.0);
+                        printf("当前已处理 %04d 组 [%s] 进度  %.2f %%", current_epoch, progress_bar, pb_num);
+                        printf("\r");
+                        current_epoch += 1;
+
                     }
                     // 当剩余字节数在0-16之间时再添加结束标志0X48 0X59，然后剩余位补0x00到32字节
                     u8 data_padding[32] = { 0x00 };
-                    int rest_size = file_size - dealt_bytes;  // 理论上rest_size应该等于rest_bytes
-                    if(rest_bytes != rest_size){ // 否则就出问题了
-                        printf("文件大小计算出错！程序终止！\n");
-                        exit(-1);
-                    }
-                    fread(data_padding, sizeof(u8), rest_size, fp_in);
+                    int rest_size = file_size - dealt_bytes;  // 文件大小不是16B的整数倍时rest_size应该等于rest_bytes，否则不等
+                    fread(data_padding, sizeof(u8), rest_size, fp_in); // 所以应该读rest_size个字节而非rest_bytes
                     data_padding[rest_size] = 0x48;             // padding
                     data_padding[rest_size + 1] = 0x59;         // padding
                     // 到这里就padding结束了，padding结束之后data_padding为cont、0x48、0x59、0x00，共32B
@@ -125,6 +169,19 @@ int main(int argc, char *argv[]){
                     }
                     fwrite(output_data_8, sizeof(u8), 16, fp_out);
 
+                    // 显示进度条，进度20等分，注意防止越界
+                    current_progress = (int)((current_epoch) * 20 / total_epoch);
+                    if(current_progress - 1 >= 0){
+                        progress_bar[current_progress - 1] = 0x3d; // 0x3d 就是 "="
+                    }
+                    if(current_progress < 20){
+                        progress_bar[current_progress] = 0x3e; // 0x3e 就是 ">"
+                    }
+                    pb_num = (double)((double)current_epoch / (double)total_epoch * 100.0);
+                    printf("当前已处理 %04d 组 [%s] 进度  %.2f %%", current_epoch, progress_bar, pb_num);
+                    printf("\r");
+                    current_epoch += 1;
+
                     // 清除相关状态，再对16-31B加密
                     memset(input_data_32, 0x0, sizeof(u32) * 4);
                     memset(output_data_32, 0x0, sizeof(u32) * 4);
@@ -137,6 +194,20 @@ int main(int argc, char *argv[]){
                         int_to_four_char(output_data_32[i], &(output_data_8[i * 4]));
                     }
                     fwrite(output_data_8, sizeof(u8), 16, fp_out);
+
+                    // 显示进度条，进度20等分，注意防止越界
+                    current_progress = (int)((current_epoch) * 20 / total_epoch);
+                    if(current_progress - 1 >= 0){
+                        progress_bar[current_progress - 1] = 0x3d; // 0x3d 就是 "="
+                    }
+                    if(current_progress < 20){
+                        progress_bar[current_progress] = 0x3e; // 0x3e 就是 ">"
+                    }
+                    pb_num = (double)((double)current_epoch / (double)total_epoch * 100.0);
+                    printf("当前已处理 %04d 组 [%s] 进度  %.2f %%", current_epoch, progress_bar, pb_num);
+                    printf("\n");
+                    current_epoch += 1;
+
                 }
                 break;
             }
@@ -152,13 +223,30 @@ int main(int argc, char *argv[]){
             }
             fwrite(output_data_8, sizeof(u8), 16, fp_out);
             dealt_bytes += 16;
+
+            // 显示进度条，进度20等分，注意防止越界
+            current_progress = (int)((current_epoch) * 20 / total_epoch);
+            if(current_progress - 1 >= 0){
+                progress_bar[current_progress - 1] = 0x3d; // 0x3d 就是 "="
+            }
+            if(current_progress < 20){
+                progress_bar[current_progress] = 0x3e; // 0x3e 就是 ">"
+            }
+            pb_num = (double)((double)current_epoch / (double)total_epoch * 100.0);
+            printf("当前已处理 %04d 组 [%s] 进度  %.2f %%", current_epoch, progress_bar, pb_num);
+            printf("\r");
+            current_epoch += 1;
         }
+
+        finish = clock();
+        duration = (double)(finish - start) / CLOCKS_PER_SEC; //单位换算成秒
+        double bps = (double)file_size / duration;
+        printf("运行结束，共计耗时 %.6f s，处理数据 %ld B，平均速度约 %.4f bps\n", duration, file_size, bps);
        
         fclose(fp_in);
         fclose(fp_key);
         fclose(fp_out);
        
-        system("pause");
     }
 
     return 0;
