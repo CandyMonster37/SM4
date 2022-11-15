@@ -102,18 +102,18 @@ void show_help_info(){
     printf("中国标准分类号（CCS）：    L80                  国际标准分类号（ICS）：  35.040\n");
     printf("发布日期：                2016-08-29           实施日期：              2017-03-01\n");
     printf("\n");
-    printf("SM4算法是一个分组算法。该算法的分组长度为 128 bit，密钥长度为 128 bit。 ");
-    printf("加密算法与密钥扩展算法都采用 32 轮非线性迭代结构。 ");
-    printf("解密算法与加密算法的结构相同，只是轮密钥的使用顺序相反，解密轮密钥是加密轮密钥的逆序。 ");
+    printf("SM4算法是一个分组算法。该算法的分组长度为 128 bit，密钥长度为 128 bit。 \n");
+    printf("加密算法与密钥扩展算法都采用 32 轮非线性迭代结构。 \n");
+    printf("解密算法与加密算法的结构相同，只是轮密钥的使用顺序相反，解密轮密钥是加密轮密钥的逆序。 \n");
     printf("\n\n");
     printf("使用说明： \n");
-    printf("用 usr.key 加密 secret.txt ，并将结果保存到 encrypted.cm ，请在终端中使用如下命令： ");
-    printf("sm4.exe --encrypt secret.txt --out encrypted.txt --key usr.key\n\n");
-    printf("用 usr.key 解密 received.cm ，并将结果保存到 decrypted.txt ，请在终端中使用如下命令： ");
-    printf("sm4.exe --decrypt received.cm --out decrypted.txt --key usr.key\n\n");
+    printf("用 usr.key 加密 secret.txt ，并将结果保存到 encrypted.cm ，请在终端中使用如下命令： \n");
+    printf("    ./sm4.exe --encrypt secret.txt --out encrypted.txt --key usr.key\n\n");
+    printf("用 usr.key 解密 received.cm ，并将结果保存到 decrypted.txt ，请在终端中使用如下命令： \n");
+    printf("    ./sm4.exe --decrypt received.cm --out decrypted.txt --key usr.key\n\n");
     printf("其他可选参数：\n");
-    printf("    --help            显示本信息并退出程序 ");
-    printf("    --test_speed      使用预设数据测速 ");
+    printf("    --help            显示本信息并退出程序 \n");
+    printf("    --test_speed      使用预设数据测速 \n");
     printf("\n");
 }
 
@@ -214,6 +214,8 @@ void test_speed(){
     printf("共计用时： %.2f s，共加密 %04d B数据、解密 %04d 数据，平均速度 %.2f bps，约 %.2f Mbps\n", duration, 16 * epoch, 16 * epoch, bps, mbps);
    
 }
+
+
 
 
 

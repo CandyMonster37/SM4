@@ -16,6 +16,9 @@ int main(int argc, char *argv[]){
 
     if(info->option == flag_help){
         show_help_info();
+        if(argc == 1){
+            system("pause");
+        }
         return 0;
     }
     if(info->option == flag_test){
@@ -251,6 +254,8 @@ int main(int argc, char *argv[]){
 
     return 0;
 }
+
+
 
 
 
