@@ -19,10 +19,16 @@ int main(int argc, char *argv[]){
         if(argc == 1){
             system("pause");
         }
+        if(info != NULL){
+            free(info);
+        }
         return 0;
     }
     if(info->option == flag_test){
         test_speed();
+        if(info != NULL){
+            free(info);
+        }
         return 0;
     }
     if(info->option == flag_encrypt || info->option == flag_decrypt){
@@ -32,6 +38,9 @@ int main(int argc, char *argv[]){
         FILE *fp_out = fopen(info->usr_out_filename, "wb");
         if(fp_in == NULL || fp_out == NULL || fp_key == NULL){
             printf("文件打开失败，请检查输入路径或路径权限！\n");
+            if(info != NULL){
+                free(info);
+            }
             return 0;
         }
         fclose(fp_out);  // 清空已存在的文件
@@ -250,6 +259,10 @@ int main(int argc, char *argv[]){
         fclose(fp_key);
         fclose(fp_out);
        
+    }
+
+    if(info != NULL){
+        free(info);
     }
 
     return 0;
